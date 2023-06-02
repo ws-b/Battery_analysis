@@ -2,9 +2,6 @@ import os
 import re
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 
 # Folder path containing the files
 win_folder_path = 'G:\\공유 드라이브\\Battery Software Lab\\Data\\Hyundai_dataset\\GITT\\FCC_(6)_GITT\\'
@@ -44,7 +41,6 @@ for file_list in file_lists:
     df = df.replace('\s+', '', regex=True)
 
     # 데이터 타입 변환
-    df['시험_시간(s)'] = pd.to_numeric(df['시험_시간(s)'], errors='coerce')
     df['전류(A)'] = pd.to_numeric(df['전류(A)'], errors='coerce')
     df['전압(V)'] = pd.to_numeric(df['전압(V)'], errors='coerce')
 
@@ -62,22 +58,3 @@ for file_list in file_lists:
     df['전류 상태'] = np.select(conditions, choices, default='Unknown')
 
     df.to_csv(save_path + file_list.replace('.txt', '.csv'), index=False, encoding='utf-8-sig')
-
-    # Plotting
-    plt.figure(figsize=(12, 6))
-
-    # 전류(A) 그래프
-    ax1 = sns.lineplot(x='시험_시간(s)', y='전류(A)', data=result, label='전류(A)')
-    ax1.set_ylabel('전류 (A)')
-
-    # 두 번째 y축 생성
-    ax2 = ax1.twinx()
-
-    # 전압(V) 그래프
-    sns.lineplot(x='시험_시간(s)', y='전압(V)', data=result, ax=ax2, color='r', label='전압(V)')
-    ax2.set_ylabel('전압 (V)')
-
-    plt.xlabel('시험 시간 (s)')
-    plt.title('시험 시간에 따른 전류와 전압')
-    plt.legend()
-    plt.show()
