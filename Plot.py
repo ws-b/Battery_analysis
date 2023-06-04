@@ -19,21 +19,32 @@ file_lists.sort()
 
     # Read the CSV file into a DataFrame
     data = pd.read_csv(folder_path + file_list, encoding='utf-8')
+    time = data['시험_시간(s)'].tolist()
+    current = data['전류(A)'].tolist()
+    voltage = data['전압(V)'].tolist()
 
+    # Create a new figure with a specific size (optional)
     plt.figure(figsize=(12, 8))
 
-    # 전류(A) 그래프
-    plt.plot(data['시험_시간(s)'], data['전류(A)'], label='전류(A)')
-    plt.ylabel('전류 (A)')
+    # Plot Current
+    plt.plot(time, current, label='Current(A)')
+    plt.ylabel('Current (A)')
 
-    # 두 번째 y축 생성
-    plt.twinx()
+    # Create a second y-axis
+    ax2 = plt.twinx()
 
-    # 전압(V) 그래프
-    plt.plot(data['시험_시간(s)'], data['전압(V)'], color='r', label='전압(V)')
-    plt.ylabel('전압 (V)')
+    # Plot Voltage on the second y-axis
+    ax2.plot(time, voltage, color='r', label='Voltage(V)')
+    ax2.set_ylabel('Voltage (V)')
 
-    plt.xlabel('시험 시간 (s)')
-    plt.title('시험 시간에 따른 전류와 전압')
+    # Set the x-axis label
+    plt.xlabel('Time (s)')
+
+    # Set the title of the plot (optional)
+    plt.title('Time / Voltage, Current graph')
+
+    # Display the legend
     plt.legend()
+
+    # Show the plot
     plt.show()
