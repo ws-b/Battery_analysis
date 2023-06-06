@@ -90,26 +90,28 @@ for i = 1 : length(data)
         data(i).R = (data(i).deltaV / data(i).avgI) .* ones(size(data(i).V));
     end
 end
-% plot
-% 
-% % R 부분은 저항 0으로 하기
-% 
-% plot(data(6).t, data(6).R)
-% 
-% xlabel('time (sec)')
-% ylabel('Resistance')
-% 
-% % x 값이 30초일 때의 y 값을 얻기
-% x_value = 7201;
-% y_value = interp1(data(2).t, data(2).R, x_value);
-% 
-% disp(y_value); % 결과 출력
 
-% %0.01 sec 에서 Resistance 
-% for i = 1:length(data(i))
-%     x_001 = data(step_chg(i)).t(1) + 0.01;
-%     data(step_chg(i)).R001s = interp1(data(step_chg(i)).t, data(step_chg(i)).R , x_001);
-% end
+SOC001sc = [];
+R001sc = [];
+SOC1sc = [];
+R1sc = [];
+SOC10sc = [];
+R10sc = [];
+SOC30sc = [];
+R30sc = [];
+SOC900sc = [];
+R900sc = [];
+SOC001sd = [];
+R001sd = [];
+SOC1sd = [];
+R1sd = [];
+SOC10sd = [];
+R10sd = [];
+SOC30sd = [];
+R30sd = [];
+SOC900sd = [];
+R900sd = [];
+
 
 % 1s , 10s, 30s 에서 Resistance 
 for i = 1:length(step_chg)-1
@@ -120,101 +122,150 @@ for i = 1:length(step_chg)-1
    data(step_chg(i)).R900s = data(step_chg(i)).R(end);
 end
 
-% 10s
-
-% 30 s
-
-% 데이터의 차이는 0.1초 = 100ms
-
-% SOC-Resistance 그래프 그리기
-
-% 각각의 Resistance에 대응되는 시간 - SOC 지정하기 
-
-% 0.001s
-
-% CATHODE, FCC = BIGIC 데이터 확인
-% ANDOE = BIGI 데이터 확인
-
-SOC001s = [];
-R001s = [];
+% 충전
+% 0.1sec
 for i = 1:length(step_chg)-1
-    SOC001s = [SOC001s, data(step_chg(i)).SOC(2)];
-    R001s = [R001s, data(step_chg(i)).R001s];
+    SOC001sc = [SOC001sc, data(step_chg(i)).SOC(1)];
+    R001sc = [R001sc, data(step_chg(i)).R(1)];
 end
 
 
 % 1s
-
-SOC1s = [];
-R1s = [];
 for i = 1:length(step_chg)-1
-    SOC1s = [SOC1s, data(step_chg(i)).SOC(11)];
-    R1s = [R1s, data(step_chg(i)).R(11)];
+    SOC1sc = [SOC1sc, data(step_chg(i)).SOC(11)];
+    R1sc = [R1sc, data(step_chg(i)).R(11)];
 end
-
 
 % 10s
-
-SOC10s = [];
-R10s = [];
 for i = 1:length(step_chg)-1
-    SOC10s = [SOC10s, data(step_chg(i)).SOC(56)];
-    R10s = [R10s, data(step_chg(i)).R10s];
+    SOC10sc = [SOC10sc, data(step_chg(i)).SOC(56)];
+    R10sc = [R10sc, data(step_chg(i)).R(56)];
 end
-
 
 
 % 30s
 
-SOC30s = [];
-R30s = [];
 for i = 1:length(step_chg)-1
-    SOC30s = [SOC30s, data(step_chg(i)).SOC(end)];
-    R30s = [R30s, data(step_chg(i)).R(end)];
+    SOC30sc = [SOC30sc, data(step_chg(i)).SOC(76)];
+    R30sc = [R30sc, data(step_chg(i)).R(76)];
 end
 
 % 900s
-SOC900s = [];
-R900s = [];
 for i = 1:length(step_chg)-1
-    SOC900s = [SOC900s, data(step_chg(i)).SOC(end)];
-    R900s = [R900s, data(step_chg(i)).R(end)];
+    SOC900sc = [SOC900sc, data(step_chg(i)).SOC(end)];
+    R900sc = [R900sc, data(step_chg(i)).R(end)];
+end
+
+% 방전
+% 0.1sec
+for i = 1:length(step_dis)
+    SOC001sd = [SOC001sd, data(step_dis(i)).SOC(1)];
+    R001sd = [R001sd, data(step_dis(i)).R(1)];
+end
+
+
+% 1s
+for i = 1:length(step_dis)
+    SOC1sd = [SOC1sd, data(step_dis(i)).SOC(11)];
+    R1sd = [R1sd, data(step_dis(i)).R(11)];
+end
+
+% 10s
+for i = 1:length(step_dis)
+    SOC10sd = [SOC10sd, data(step_dis(i)).SOC(56)];
+    R10sd = [R10sd, data(step_dis(i)).R(56)];
+end
+
+
+% 30s
+
+for i = 1:length(step_dis)
+    SOC30sd = [SOC30sd, data(step_dis(i)).SOC(76)];
+    R30sd = [R30sd, data(step_dis(i)).R(76)];
+end
+
+% 900s
+for i = 1:length(step_dis)
+    SOC900sd = [SOC900sd, data(step_dis(i)).SOC(end)];
+    R900sd = [R900sd, data(step_dis(i)).R(end)];
 end
 
 
 % spline을 사용하여 점들을 부드럽게 이어주기
-smoothed_SOC_001s = linspace(min(SOC001s), max(SOC001s), 100);
-smoothed_R_001s = spline(SOC001s, R001s, smoothed_SOC_001s);
 
-smoothed_SOC_1s = linspace(min(SOC1s), max(SOC1s), 100); % 보다 부드러운 곡선을 위해 임의의 구간을 생성합니다.
-smoothed_R_1s = spline(SOC1s, R1s, smoothed_SOC_1s); % spline 함수를 사용하여 점들을 부드럽게 이어줍니다.
+smoothed_SOC_001sc = linspace(min(SOC001sc), max(SOC001sc), 100);
+smoothed_R_001sc = spline(SOC001sc, R001sc, smoothed_SOC_001sc);
 
-smoothed_SOC_10s = linspace(min(SOC10s), max(SOC10s), 100);
-smoothed_R_10s = spline(SOC10s, R10s, smoothed_SOC_10s);
+smoothed_SOC_1sc = linspace(min(SOC1sc), max(SOC1sc), 100); % 보다 부드러운 곡선을 위해 임의의 구간을 생성합니다.
+smoothed_R_1sc = spline(SOC1sc, R1sc, smoothed_SOC_1sc); % spline 함수를 사용하여 점들을 부드럽게 이어줍니다.
 
-smoothed_SOC_30s = linspace(min(SOC30s), max(SOC30s), 100); % 보다 부드러운 곡선을 위해 임의의 구간을 생성합니다.
-smoothed_R_30s = spline(SOC900s, R30s, smoothed_SOC_30s); % spline 함수를 사용하여 점들을 부드럽게 이어줍니다.
+smoothed_SOC_10sc = linspace(min(SOC10sc), max(SOC10sc), 100);
+smoothed_R_10sc = spline(SOC10sc, R10sc, smoothed_SOC_10sc);
 
-smoothed_SOC_900s = linspace(min(SOC900s), max(SOC900s), 100); 
-smoothed_R_900s = spline(SOC900s, R900s, smoothed_SOC_900s);
+smoothed_SOC_30sc = linspace(min(SOC30sc), max(SOC30sc), 100); 
+smoothed_R_30sc = spline(SOC900sc, R30sc, smoothed_SOC_30sc); 
+
+smoothed_SOC_900sc = linspace(min(SOC900sc), max(SOC900sc), 100); 
+smoothed_R_900sc = spline(SOC900sc, R900sc, smoothed_SOC_900sc);
+
+% Generate smoothed data for 'sd' case
+
+smoothed_SOC_001sd = linspace(min(SOC001sd), max(SOC001sd), 100);
+smoothed_R_001sd = spline(SOC001sd, R001sd, smoothed_SOC_001sd);
+
+smoothed_SOC_1sd = linspace(min(SOC1sd), max(SOC1sd), 100); 
+smoothed_R_1sd = spline(SOC1sd, R1sd, smoothed_SOC_1sd); 
+
+smoothed_SOC_10sd = linspace(min(SOC10sd), max(SOC10sd), 100);
+smoothed_R_10sd = spline(SOC10sd, R10sd, smoothed_SOC_10sd);
+
+smoothed_SOC_30sd = linspace(min(SOC30sd), max(SOC30sd), 100); 
+smoothed_R_30sd = spline(SOC30sd, R30sd, smoothed_SOC_30sd); 
+
+smoothed_SOC_900sd = linspace(min(SOC900sd), max(SOC900sd), 100); 
+smoothed_R_900sd = spline(SOC900sd, R900sd, smoothed_SOC_900sd);
+
 
 % 그래프 그리기
 figure;
 hold on;
-plot(SOC001s, R001s, 'o');
-plot(smoothed_SOC_001s, smoothed_R_001s);
-plot(SOC1s, R1s, 'o');
-plot(smoothed_SOC_1s, smoothed_R_1s);
-plot(SOC10s, R10s, 'o');
-plot(smoothed_SOC_10s, smoothed_R_10s);
-plot(SOC30s, R30s, 'o');
-plot(smoothed_SOC_30s, smoothed_R_30s);
-plot(SOC900s, R900s, 'o');
-plot(smoothed_SOC_900s, smoothed_R_900s);
+plot(SOC001sc, R001sc, 'o');
+plot(smoothed_SOC_001sc, smoothed_R_001sc);
+plot(SOC1sc, R1sc, 'o');
+plot(smoothed_SOC_1sc, smoothed_R_1sc);
+plot(SOC10sc, R10sc, 'o');
+plot(smoothed_SOC_10sc, smoothed_R_10sc);
+plot(SOC30sc, R30sc, 'o');
+plot(smoothed_SOC_30sc, smoothed_R_30sc);
+plot(SOC900sc, R900sc, 'o');
+plot(smoothed_SOC_900sc, smoothed_R_900sc);
 hold off;
 
 xlabel('SOC');
 ylabel('Resistance (\Omega )', 'fontsize', 12);
-title('SOC vs Resistance');
+title('SOC vs Resistance (charge)');
 legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)', '900s', '900s (line)'); 
 xlim([0 1])
+
+% 방전 그래프
+% 그래프 그리기
+% Plot the graph for 'sd' case
+figure(2);
+hold on;
+plot(SOC001sd, R001sd, 'o');
+plot(smoothed_SOC_001sd, smoothed_R_001sd);
+plot(SOC1sd, R1sd, 'o');
+plot(smoothed_SOC_1sd, smoothed_R_1sd);
+plot(SOC10sd, R10sd, 'o');
+plot(smoothed_SOC_10sd, smoothed_R_10sd);
+plot(SOC30sd, R30sd, 'o');
+plot(smoothed_SOC_30sd, smoothed_R_30sd);
+plot(SOC900sd, R900sd, 'o');
+plot(smoothed_SOC_900sd, smoothed_R_900sd);
+hold off;
+
+xlabel('SOC');
+ylabel('Resistance (\Omega)', 'fontsize', 12);
+title('SOC vs Resistance (Discharge)');
+legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)', '900s', '900s (line)');
+xlim([0 1]);
