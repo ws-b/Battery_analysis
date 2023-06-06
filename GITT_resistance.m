@@ -91,38 +91,34 @@ for i = 1 : length(data)
     end
 end
 % plot
+% 
+% % R 부분은 저항 0으로 하기
+% 
+% plot(data(6).t, data(6).R)
+% 
+% xlabel('time (sec)')
+% ylabel('Resistance')
+% 
+% % x 값이 30초일 때의 y 값을 얻기
+% x_value = 7201;
+% y_value = interp1(data(2).t, data(2).R, x_value);
+% 
+% disp(y_value); % 결과 출력
 
-% R 부분은 저항 0으로 하기
-
-plot(data(6).t, data(6).R)
-
-xlabel('time (sec)')
-ylabel('Resistance')
-
-% x 값이 30초일 때의 y 값을 얻기
-x_value = 7201;
-y_value = interp1(data(2).t, data(2).R, x_value);
-
-disp(y_value); % 결과 출력
-
-%0.01 sec 에서 Resistance 
-for i = 1:length(data(i))
-    x_001 = data(BigI(i)).t(1) + 0.01;
-    data(BigI(i)).R001s = interp1(data(BigI(i)).t, data(BigI(i)).R , x_001);
-end
+% %0.01 sec 에서 Resistance 
+% for i = 1:length(data(i))
+%     x_001 = data(step_chg(i)).t(1) + 0.01;
+%     data(step_chg(i)).R001s = interp1(data(step_chg(i)).t, data(step_chg(i)).R , x_001);
+% end
 
 % 1s , 10s, 30s 에서 Resistance 
-for i = 1:length(BigI)
-   data(BigI(i)).R1s = data(BigI(i)).R(11);
-   data(BigI(i)).R10s = data(BigI(i)).R(56);
-   data(BigI(i)).R30s = data(BigI(i)).R(end);
+for i = 1:length(step_chg)-1
+   data(step_chg(i)).R001s = data(step_chg(i)).R(1);
+   data(step_chg(i)).R1s = data(step_chg(i)).R(11);
+   data(step_chg(i)).R10s = data(step_chg(i)).R(56);
+   data(step_chg(i)).R30s = data(step_chg(i)).R(76);
+   data(step_chg(i)).R900s = data(step_chg(i)).R(end);
 end
-
-% BigI에서 charge 상태까지의 step 얻기
-% -- CATHOD, FCC 에서는 BIGIC,D 구간 얻기 -- %
-BigIC = BigI(BigI < step_chg(end));
-BigID = BigI(BigI >= step_chg(end));
-
 
 % 10s
 
@@ -134,10 +130,6 @@ BigID = BigI(BigI >= step_chg(end));
 
 % 각각의 Resistance에 대응되는 시간 - SOC 지정하기 
 
-
-
-
-
 % 0.001s
 
 % CATHODE, FCC = BIGIC 데이터 확인
@@ -145,9 +137,9 @@ BigID = BigI(BigI >= step_chg(end));
 
 SOC001s = [];
 R001s = [];
-for i = 1:length(BigIC)
-    SOC001s = [SOC001s, data(BigIC(i)).SOC(2)];
-    R001s = [R001s, data(BigIC(i)).R001s];
+for i = 1:length(step_chg)-1
+    SOC001s = [SOC001s, data(step_chg(i)).SOC(2)];
+    R001s = [R001s, data(step_chg(i)).R001s];
 end
 
 
@@ -155,9 +147,9 @@ end
 
 SOC1s = [];
 R1s = [];
-for i = 1:length(BigIC)
-    SOC1s = [SOC1s, data(BigIC(i)).SOC(11)];
-    R1s = [R1s, data(BigIC(i)).R(11)];
+for i = 1:length(step_chg)-1
+    SOC1s = [SOC1s, data(step_chg(i)).SOC(11)];
+    R1s = [R1s, data(step_chg(i)).R(11)];
 end
 
 
@@ -165,9 +157,9 @@ end
 
 SOC10s = [];
 R10s = [];
-for i = 1:length(BigIC)
-    SOC10s = [SOC10s, data(BigIC(i)).SOC(56)];
-    R10s = [R10s, data(BigIC(i)).R10s];
+for i = 1:length(step_chg)-1
+    SOC10s = [SOC10s, data(step_chg(i)).SOC(56)];
+    R10s = [R10s, data(step_chg(i)).R10s];
 end
 
 
@@ -176,17 +168,17 @@ end
 
 SOC30s = [];
 R30s = [];
-for i = 1:length(BigIC)
-    SOC30s = [SOC30s, data(BigIC(i)).SOC(end)];
-    R30s = [R30s, data(BigIC(i)).R(end)];
+for i = 1:length(step_chg)-1
+    SOC30s = [SOC30s, data(step_chg(i)).SOC(end)];
+    R30s = [R30s, data(step_chg(i)).R(end)];
 end
 
 % 900s
 SOC900s = [];
 R900s = [];
-for i = 1:length(BigIC)
-    SOC900s = [SOC900s, data(BigIC(i)).SOC(end)];
-    R900s = [R900s, data(BigIC(i)).R(end)];
+for i = 1:length(step_chg)-1
+    SOC900s = [SOC900s, data(step_chg(i)).SOC(end)];
+    R900s = [R900s, data(step_chg(i)).R(end)];
 end
 
 
@@ -217,10 +209,12 @@ plot(SOC10s, R10s, 'o');
 plot(smoothed_SOC_10s, smoothed_R_10s);
 plot(SOC30s, R30s, 'o');
 plot(smoothed_SOC_30s, smoothed_R_30s);
+plot(SOC900s, R900s, 'o');
+plot(smoothed_SOC_900s, smoothed_R_900s);
 hold off;
 
 xlabel('SOC');
 ylabel('Resistance (\Omega )', 'fontsize', 12);
 title('SOC vs Resistance');
-legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)'); 
+legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)', '900s', '900s (line)'); 
 xlim([0 1])
