@@ -1,7 +1,7 @@
 % 파일 경로 가져오기
 clc; clear; close all;
 
-data_folder = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\Processed_Data\GITT\FCC_(6)_GITT';
+data_folder = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\Processed_Data\GITT\FCC_(6)_GITT2';
 save_path = data_folder;
 I_1C = 0.000477; %[A]
 
@@ -39,8 +39,8 @@ end
 
 for j = 1:length(data)
      %calculate capacities
-     data(j).Q = abs(trapz(data(j).t,data(j).I))/3600; %[Ah]
-     data(j).cumQ = abs(cumtrapz(data(j).t,data(j).I))/3600; %[Ah]
+     data(j).Q = trapz(data(j).t,data(j).I)/3600; %[Ah]
+     data(j).cumQ = cumtrapz(data(j).t,data(j).I)/3600; %[Ah]
      
 
      % data(j).cumQ = abs(cumtrapz(data(j).t,data(j).I))/3600; %[Ah]

@@ -5,11 +5,11 @@ clc; clear; close all;
 %% Interface
 
 % data_folder = 'C:\Users\deu04\OneDrive\문서\MATLAB\Formation';
-data_folder = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\GITT\FCC_(6)_GITT';
+data_folder = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\RAW\GITT\FCC_(6)_GITT2';
 % data_folder = 'C:\Users\jsong\Documents\MATLAB\Data\Formation\CHC_10';
 
 
-save_path = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\Processed_Data\GITT\FCC_(6)_GITT'
+save_path = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\Processed_Data\GITT\FCC_(6)_GITT2'
 I_1C = 0.00477; %[A]
 n_hd = 14; % headline number used in 'readtable' option. WonA: 14, Maccor: 3.
 sample_plot = 1;
@@ -82,7 +82,7 @@ for i = 1:length(files)
         plot(data1.t/3600,data1.I/I_1C,'-')
         yyaxis right
         ylabel('current (C)')
-
+        xlim([17.758 17.76])
     end
 
     % make struct (output format)
