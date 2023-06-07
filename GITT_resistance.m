@@ -116,7 +116,7 @@ R900sd = [];
 % 1s , 10s, 30s 에서 Resistance 
 for i = 1:length(step_chg)-1
    data(step_chg(i)).R001s = data(step_chg(i)).R(1);
-   data(step_chg(i)).R1s = data(step_chg(i)).R(11);
+   data(step_chg(i)).R1s = data(step_chg(i)).R(10);
    data(step_chg(i)).R10s = data(step_chg(i)).R(56);
    data(step_chg(i)).R30s = data(step_chg(i)).R(76);
    data(step_chg(i)).R900s = data(step_chg(i)).R(end);
