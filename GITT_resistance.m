@@ -132,8 +132,8 @@ end
 
 % 1s
 for i = 1:length(step_chg)-1
-    SOC1sc = [SOC1sc, data(step_chg(i)).SOC(11)];
-    R1sc = [R1sc, data(step_chg(i)).R(11)];
+    SOC1sc = [SOC1sc, data(step_chg(i)).SOC(10)];
+    R1sc = [R1sc, data(step_chg(i)).R(10)];
 end
 
 % 10s
@@ -166,8 +166,8 @@ end
 
 % 1s
 for i = 1:length(step_dis)
-    SOC1sd = [SOC1sd, data(step_dis(i)).SOC(11)];
-    R1sd = [R1sd, data(step_dis(i)).R(11)];
+    SOC1sd = [SOC1sd, data(step_dis(i)).SOC(10)];
+    R1sd = [R1sd, data(step_dis(i)).R(10)];
 end
 
 % 10s
@@ -203,7 +203,7 @@ smoothed_SOC_10sc = linspace(min(SOC10sc), max(SOC10sc), 100);
 smoothed_R_10sc = spline(SOC10sc, R10sc, smoothed_SOC_10sc);
 
 smoothed_SOC_30sc = linspace(min(SOC30sc), max(SOC30sc), 100); 
-smoothed_R_30sc = spline(SOC900sc, R30sc, smoothed_SOC_30sc); 
+smoothed_R_30sc = spline(SOC30sc, R30sc, smoothed_SOC_30sc); 
 
 smoothed_SOC_900sc = linspace(min(SOC900sc), max(SOC900sc), 100); 
 smoothed_R_900sc = spline(SOC900sc, R900sc, smoothed_SOC_900sc);
