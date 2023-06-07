@@ -134,9 +134,6 @@ for i = 1 : length(data)
         data(i).R = (data(i).deltaV / data(i).avgI) .* ones(size(data(i).V));
     end
 end
-% plot
-
-% BigI 부분에서만 plot 하게 만들기
 
 % R 부분은 저항 0으로 하기, BigI에 해당하는 data번호만 그리기
 
@@ -151,12 +148,6 @@ y_value = interp1(data(2).t, data(2).R, x_value);
 
 disp(y_value); % 결과 출력
 
-% %0.01 sec 에서 Resistance 
-% for i = 1:length(BigI)
-%     x_001 = data(BigI(i)).t(1) + 0.01;
-%     data(BigI(i)).R001s = interp1(data(BigI(i)).t, data(BigI(i)).R , x_001);
-% end
-
 % 1s , 10s, 30s 에서 Resistance 
 for i = 1:length(BigI)
    data((BigI(i))).R001s = data(BigI(i)).R(1);
@@ -165,21 +156,6 @@ for i = 1:length(BigI)
    data(BigI(i)).R30s = data(BigI(i)).R(end);
 end
 
-% BigI에서 charge 상태까지의 step 얻기
-% -- CATHOD, FCC 에서는 BIGIC,D 구간 얻기 -- %
-% BigIC = BigI(BigI < step_chg(end));
-% BigID = BigI(BigI >= step_dis(end));
-
-
-% 10s
-% 30 s
-% 데이터의 차이는 0.1초 = 100ms
-% SOC-Resistance 그래프 그리기
-% 각각의 Resistance에 대응되는 시간 - SOC 지정하기
-
-% 0.001s
-% CATHODE, FCC = BIGIC 데이터 확인
-% ANDOE = BIGI 데이터 확인
 SOC001sc = [];
 R001sc = [];
 SOC1sc = [];
@@ -232,45 +208,6 @@ elseif id_cfa == 3
     end
 end
 
-% % 1s
-% SOC1s = [];
-% R1s = [];
-% for i = 1:length(BigIC)
-%     if id_cfa == 1 || id_cfa == 2
-%         SOC1s = [SOC1s, data(BigIC(i)).SOC(11)];
-%         R1s = [R1s, data(BigIC(i)).R1s];
-%     elseif id_cfa == 3
-%         SOC1s = [SOC1s, data(BigI(i)).SOC(11)];
-%         R1s = [R1s, data(BigI(i)).R1s];
-%     end
-% end
-% 
-% % 10s
-% SOC10s = [];
-% R10s = [];
-% for i = 1:length(BigIC)
-%     if id_cfa == 1 || id_cfa == 2
-%         SOC10s = [SOC10s, data(BigIC(i)).SOC(56)];
-%         R10s = [R10s, data(BigIC(i)).R10s];
-%     elseif id_cfa == 3
-%         SOC10s = [SOC10s, data(BigI(i)).SOC(56)];
-%         R10s = [R10s, data(BigI(i)).R10s];
-%     end
-% end
-
-% % 30s
-% SOC30s = [];
-% R30s = [];
-% for i = 1:length(BigIC)
-%     if id_cfa == 1 || id_cfa == 2
-%         SOC30s = [SOC30s, data(BigIC(i)).SOC(end)];
-%         R30s = [R30s, data(BigIC(i)).R(end)];
-%     elseif id_cfa == 3
-%         SOC30s = [SOC30s, data(BigI(i)).SOC(end)];
-%         R30s = [R30s, data(BigI(i)).R(end)];
-%     end
-% end
-% spline을 사용하여 점들을 부드럽게 이어주기
 % Generate smoothed data for 'sc' case
 smoothed_SOC_001sc = linspace(min(SOC001sc), max(SOC001sc), 100);
 smoothed_R_001sc = spline(SOC001sc, R001sc, smoothed_SOC_001sc);
@@ -334,3 +271,82 @@ ylabel('Resistance (\Omega)', 'fontsize', 12);
 title('SOC vs Resistance (Discharge)');
 legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)');
 xlim([0 1]);
+
+for i = 1 : length(data)
+    data(i).R1 = [];
+    data(i).R2 = [];
+    data(i).C = [];
+    data(i).opR1 = [];
+    data(i).opR2 = [];
+    data(i).opC = [];
+end
+
+% 시간 초기화
+for i = 1 : length(BigIC)
+    initialTime = data(BigIC(i)).t(1); % 초기 시간 저장
+    data(BigIC(i)).t = data(BigIC(i)).t - initialTime; % 초기 시간을 빼서 시간 초기화
+end
+ 
+ 
+figure(3);
+hold on;
+
+% for i = 1: length(BigIC)
+    i = 1
+    plot(data(BigIC(i)).t, data(BigIC(i)).V);
+
+    % 최소값과 최대값 계산
+    minVoltage = min(data(BigIC(i)).V);
+    maxVoltage = max(data(BigIC(i)).V);
+
+    % 63.2% 값 계산
+    targetVoltage = minVoltage + 0.632 * (maxVoltage - minVoltage);
+
+    % 63.2%에 가장 가까운 값의 인덱스 찾기
+    [~, idx] = min(abs(data(BigIC(i)).V - targetVoltage));
+
+    % 해당 시간 찾기
+    timeAt632 = data(BigIC(i)).t(idx);
+
+    % 해당 시간에 선 그리기
+    line([timeAt632, timeAt632], [minVoltage, maxVoltage], 'Color', 'red', 'LineStyle', '--');
+
+    xlabel('Time');
+    ylabel('Voltage (V)', 'fontsize', 12);
+    title('Voltage - Time Graph');
+%end
+hold off;
+
+current = data(BigIC(i)).I; % Current values
+voltage = data(BigIC(i)).V; % Voltage values
+time = data(BigIC(i)).t;    % Time values
+
+% Function to fit
+func = @(params, t) current * params(1) *(params(1) + params(2)) / (params(1) + params(2)*exp(-(params(1)/params(2)+1)*t/(params(1) * params(3))));
+
+% Initial estimates for parameters
+params0 = [12.5, 8.5, 1]; % [R1, R2, C]
+
+lb = [0, 0, 0]; % Lower bounds
+ub = [inf, inf, inf]; % Upper bounds
+
+% Fit the model to the data
+params = lsqcurvefit(func, params0, time, voltage, lb, ub);
+
+% Display the estimated parameters
+fprintf('R1: %f, R2: %f, C: %f\n', params(1), params(2), params(3));
+
+
+
+% % 매개변수를 사용하여 모델을 계산
+% model_V = func(params, data(BigIC(i)).t);
+% 
+% figure(4);  % 새로운 figure를 생성
+% hold on;
+% plot(data(BigIC(i)).t, data(BigIC(i)).V, 'b');  % 실제 데이터를 파란색으로 표시
+% plot(data(BigIC(i)).t, model_V, 'r');  % 모델을 빨간색으로 표시
+% xlabel('Time');
+% ylabel('Voltage (V)', 'fontsize', 12);
+% title('Voltage - Time Graph');
+% legend('Data', 'Model');  % 범례 추가
+% hold off;
