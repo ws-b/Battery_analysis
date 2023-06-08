@@ -292,7 +292,7 @@ figure(3);
 hold on;
 
 % for i = 1: length(BigIC)
-    i = 1
+    i = 6
     plot(data(BigIC(i)).t, data(BigIC(i)).V);
 
     % 최소값과 최대값 계산
@@ -318,35 +318,7 @@ hold on;
 hold off;
 
 current = data(BigIC(i)).I; % Current values
-voltage = data(BigIC(i)).V; % Voltage values
+voltage = data(BigIC(i)).deltaV; % Voltage values
 time = data(BigIC(i)).t;    % Time values
 
-% Function to fit
-func = @(params, t) current * params(1) *(params(1) + params(2)) / (params(1) + params(2)*exp(-(params(1)/params(2)+1)*t/(params(1) * params(3))));
-
-% Initial estimates for parameters
-params0 = [12.5, 8.5, 1]; % [R1, R2, C]
-
-lb = [0, 0, 0]; % Lower bounds
-ub = [inf, inf, inf]; % Upper bounds
-
-% Fit the model to the data
-params = lsqcurvefit(func, params0, time, voltage, lb, ub);
-
-% Display the estimated parameters
-fprintf('R1: %f, R2: %f, C: %f\n', params(1), params(2), params(3));
-
-
-
-% % 매개변수를 사용하여 모델을 계산
-% model_V = func(params, data(BigIC(i)).t);
-% 
-% figure(4);  % 새로운 figure를 생성
-% hold on;
-% plot(data(BigIC(i)).t, data(BigIC(i)).V, 'b');  % 실제 데이터를 파란색으로 표시
-% plot(data(BigIC(i)).t, model_V, 'r');  % 모델을 빨간색으로 표시
-% xlabel('Time');
-% ylabel('Voltage (V)', 'fontsize', 12);
-% title('Voltage - Time Graph');
-% legend('Data', 'Model');  % 범례 추가
-% hold off;
+save('dcir_fit.mat','data')
