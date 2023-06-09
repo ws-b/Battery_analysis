@@ -269,3 +269,13 @@ ylabel('Resistance (\Omega)', 'fontsize', 12);
 title('SOC vs Resistance (Discharge)');
 legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)', '900s', '900s (line)');
 xlim([0 1]);
+
+
+% 시간 초기화
+for i = 1 : length(data)
+    initialTime = data(i).t(1); % 초기 시간 저장
+    data(i).t = data(i).t - initialTime; % 초기 시간을 빼서 시간 초기화
+end
+ 
+
+save('gitt_fit.mat','data')

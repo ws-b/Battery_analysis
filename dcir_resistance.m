@@ -317,8 +317,5 @@ hold on;
 %end
 hold off;
 
-current = data(BigIC(i)).I; % Current values
-voltage = data(BigIC(i)).deltaV; % Voltage values
-time = data(BigIC(i)).t;    % Time values
 
 save('dcir_fit.mat','data')
