@@ -1,67 +1,60 @@
 function fit_data()
-    % 데이터 로드
+    % Load the data
     load('gitt_fit.mat');
     deltaV_exp = data(22).deltaV;
     time_exp = data(22).t;
     
-    % 최적화를 위한 초기 추정값
-    R1 = 12.5032;
-    R2 = 24.4340;
-    C = 0.00806;
-    A = data(22).V(56) - data(22).V(133)
-    B = 1200
+    % Initial estimates for optimization
+    A = data(22).V(56) - data(22).V(133);
+    B = 901;
 
-    initial_guess = [R1, R2, C, A, B];
+    initial_guess = [A, B];
     
-    % fmincon을 사용하여 최적화 수행
+    % Perform optimization using fmincon
     options = optimoptions('fmincon', 'Display', 'iter', 'MaxIterations', 100);
-    lower_bound = [0, 0, 0, -Inf, 900];
-    upper_bound = [Inf, Inf, Inf, 0, Inf];
+    lower_bound = [-Inf, 900];
+    upper_bound = [0, Inf];
     [opt_params, rms] = fmincon(@(params) cost_function(params, time_exp, deltaV_exp), ...
         initial_guess, [], [], [], [], lower_bound, upper_bound, [], options); 
 
-    % 최적화된 파라미터 출력
+    % Print optimized parameters
     disp("Optimized Parameters:");
-    disp("R1: " + opt_params(1));
-    disp("R2: " + opt_params(2));
-    disp("C: " + opt_params(3));
-    disp("A: " + opt_params(4));
-    disp("B: " + opt_params(5));
+    disp("A: " + opt_params(1));
+    disp("B: " + opt_params(2));
     
-    % 최적화된 파라미터를 사용하여 모델 예측
-    voltage_model = model_func(time_exp, opt_params(1), opt_params(2), opt_params(3), opt_params(4), opt_params(5));
+    % Predict using the model with optimized parameters
+    voltage_model = model_func(time_exp, opt_params(1), opt_params(2));
     
-    % 데이터와 모델 결과를 그래프로 플롯
+    % Plot the data and model result
     plot(time_exp, deltaV_exp, 'b-', time_exp, voltage_model, 'r--');
-    legend('실험 데이터', '모델 결과');
-    xlabel('시간');
-    ylabel('전압');
-    title('실험 데이터와 모델 결과');
+    legend('Experimental Data', 'Model Result');
+    xlabel('Time');
+    ylabel('Voltage');
+    title('Experimental Data and Model Result');
 end
 
-
 function cost = cost_function(params, time, deltaV)
-    R1 = params(1);
-    R2 = params(2);
-    C = params(3);
-    A = params(4);
-    B = params(5);
+    A = params(1);
+    B = params(2);
     
-    % 모델 함수를 사용하여 예측 전압 계산
-    voltage_model = model_func(time, R1, R2, C, A, B);
+    % Calculate the predicted voltage using the model function
+    voltage_model = model_func(time, A, B);
     
-    % RMS 오차 계산
+    % Calculate RMS error
     error = deltaV - voltage_model;
     cost = sqrt(mean(error.^2));
 
 end
 
-% 모델 함수 정의
-function voltage = model_func(time, R1, R2, C, A, B)
+% Model function definition
+function voltage = model_func(time, A, B)
     I = 0.00048;
-    voltage = zeros(size(time)); % 전압을 저장할 벡터 초기화
+    R1 = 24.5755;
+    R2 = 77.0154;
+    C = 8.4357;
+    voltage = zeros(size(time)); % Initialize a vector to store voltage
     for i = 1:length(time)
-        t = time(i); % 각 시간 단계에 대해 전압 계산
-        voltage(i) = I * R1 * (R1 + R2 + A * log(1-sqrt(t/B))) / (R1 + (R2 + A * log(1-sqrt(t/B))) * exp((-R1/(R2+A * log(1-sqrt(t/B))) + 1) * t / (R1 * C)));
+        t = time(i); % Calculate the voltage for each time step
+        voltage(i) = I * R1 * (R1 + R2 + A * (1-sqrt(t/B))) / (R1 + (R2 + A * (1-sqrt(t/B))) * exp((-R1/(R2+A * (1-sqrt(t/B))) + 1) * t / (R1 * C)));
     end
 end
