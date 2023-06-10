@@ -4,12 +4,21 @@ clc; clear; close all;
 
 %% Interface
 
-% data_folder = 'C:\Users\deu04\OneDrive\문서\MATLAB\Formation';
-data_folder = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\RAW\GITT\FCC_(6)_GITT2';
-% data_folder = 'C:\Users\jsong\Documents\MATLAB\Data\Formation\CHC_10';
+data_folder = 'G:\공유 드라이브\Battery Software Lab\Data\Hyundai_dataset\DCIR(1,2)\HNE_(5)_FC_DCIR';
 
+% Replace 'RAW' with 'Processed_Data' in the path
+save_path = strrep(data_folder, 'Data', 'Processed_Data');
 
-save_path = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\Processed_Data\GITT\FCC_(6)_GITT2'
+% Create the directory if it doesn't exist
+if ~exist(save_path, 'dir')
+   mkdir(save_path)
+end
+
+% Process the files...
+
+% Example: saving a variable 'data'
+% data = [1, 2, 3, 4, 5];
+% save(fullfile(save_path, 'data.mat'), 'data');
 I_1C = 0.00477; %[A]
 n_hd = 14; % headline number used in 'readtable' option. WonA: 14, Maccor: 3.
 sample_plot = 1;
