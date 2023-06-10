@@ -14,11 +14,6 @@ if ~exist(save_path, 'dir')
    mkdir(save_path)
 end
 
-% Process the files...
-
-% Example: saving a variable 'data'
-% data = [1, 2, 3, 4, 5];
-% save(fullfile(save_path, 'data.mat'), 'data');
 I_1C = 0.00477; %[A]
 n_hd = 14; % headline number used in 'readtable' option. WonA: 14, Maccor: 3.
 sample_plot = 1;
