@@ -4,7 +4,7 @@ clc; clear; close all;
 
 %% Interface
 
-data_folder = 'G:\공유 드라이브\Battery Software Lab\Data\Hyundai_dataset\DCIR(1,2)\HNE_(5)_FC_DCIR';
+data_folder = 'G:\공유 드라이브\Battery Software Lab\Data\Hyundai_dataset\GITT\FCC_(6)_GITT';
 
 % Replace 'RAW' with 'Processed_Data' in the path
 save_path = strrep(data_folder, 'Data', 'Processed_Data');
@@ -16,7 +16,7 @@ end
 
 I_1C = 0.00477; %[A]
 n_hd = 14; % headline number used in 'readtable' option. WonA: 14, Maccor: 3.
-sample_plot = 1;
+sample_plot = 6;
 
 %% Engine
 slash = filesep;
@@ -86,7 +86,6 @@ for i = 1:length(files)
         plot(data1.t/3600,data1.I/I_1C,'-')
         yyaxis right
         ylabel('current (C)')
-        xlim([17.758 17.76])
     end
 
     % make struct (output format)
