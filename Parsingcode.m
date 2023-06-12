@@ -115,9 +115,6 @@ for i = 1:length(files)
     end
 
     % save output data
-    if ~isfolder(save_path)
-        mkdir(save_path)
-    end
     save_fullpath = [save_path slash files(i).name(1:end-4) '.mat'];
     save(save_fullpath,'data')
 
