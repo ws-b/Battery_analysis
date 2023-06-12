@@ -76,7 +76,7 @@ for i = 1:length(files)
     % plot for selected samples
     if ismember(sample_plot,i)
         figure
-        title(files(i).name(1:end-4))
+        title(strrep(files(i).name(1:end-4), '_', '\_')) % Replace '_' with '\_' in the title
         hold on
         plot(data1.t/3600,data1.V,'-')
         xlabel('time (hours)')
@@ -86,6 +86,10 @@ for i = 1:length(files)
         plot(data1.t/3600,data1.I/I_1C,'-')
         yyaxis right
         ylabel('current (C)')
+        
+        % time_lo_bound = 7228.72 / 3600;
+        % time_up_bound = 8128.72 / 3600;
+        % xlim([time_lo_bound, time_up_bound])
     end
 
     % make struct (output format)
