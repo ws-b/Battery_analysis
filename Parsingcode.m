@@ -4,7 +4,7 @@ clc; clear; close all;
 
 %% Interface
 
-data_folder = 'G:\공유 드라이브\Battery Software Lab\Data\Hyundai_dataset\GITT\FCC_(6)_GITT';
+data_folder = 'G:\공유 드라이브\Battery Software Lab\Data\Hyundai_dataset\GITT\AHC_(5)_GITT';
 
 % Replace 'RAW' with 'Processed_Data' in the path
 save_path = strrep(data_folder, 'Data', 'Processed_Data');
@@ -14,9 +14,9 @@ if ~exist(save_path, 'dir')
    mkdir(save_path)
 end
 
-I_1C = 0.00477; %[A]
+I_1C = 0.000477; %[A]
 n_hd = 14; % headline number used in 'readtable' option. WonA: 14, Maccor: 3.
-sample_plot = 6;
+sample_plot = 1;
 
 %% Engine
 slash = filesep;
@@ -57,8 +57,6 @@ for i = 1:length(files)
             end
             data1.step(j) = m;
         end
-
-
 
      %  check for error, if any step has more than one types
      vec_step = unique(data1.step);
