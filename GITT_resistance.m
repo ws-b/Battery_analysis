@@ -1,9 +1,10 @@
 % 파일 경로 가져오기
 clc; clear; close all;
 
-data_folder = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\Processed_Data\GITT\FCC_(6)_GITT2';
+data_folder = 'G:\공유 드라이브\Battery Software Lab\Processed_data\Hyundai_dataset\GITT\AHC_(5)_GITT';
 save_path = data_folder;
 I_1C = 0.000477; %[A]
+id_cfa = 3; % 1 for cathode, 2 for fullcell , 3 for anode 
 
 % MAT 파일 가져오기
 slash = filesep;
@@ -51,7 +52,19 @@ end
 total_QC = sum(abs([data(step_chg).Q]));  % charge 상태 전체 Q값
 total_QD = sum(abs([data(step_dis).Q])); % discharge 상태 전체 Q값
 
-
+% % cumsumQ 필드 추가
+% for i = 1:length(data)
+%     if i == 1
+%         data(i).cumsumQ = data(i).cumQ;
+%     else
+%         data(i).cumsumQ = data(i-1).cumsumQ(end) + data(i).cumQ;
+%     end
+% end
+% 
+% for i = 1 : length(data)
+%     % CATODE, FCC -- > data(i).SOC = data(i).cumsumQ/total_QC\
+%     data(i).SOC = data(i).cumsumQ/total_QC; % Anode
+% end
 
 % cumsumQ 필드 추가
 for i = 1:length(data)
@@ -63,8 +76,14 @@ for i = 1:length(data)
 end
 
 for i = 1 : length(data)
-    % CATODE, FCC -- > data(i).SOC = data(i).cumsumQ/total_QC\
-    data(i).SOC = data(i).cumsumQ/total_QC; % Anode
+    if id_cfa == 1 || id_cfa == 2 % FCC, Cathode
+        data(i).SOC = data(i).cumsumQ/total_QC; 
+
+    elseif id_cfa == 3 % Anode
+        data(i).SOC = 1 + data(i).cumsumQ/total_QD;
+    else
+        error('Invalid id_cfa value. Please choose 1 for cathode, 2 for FCC, or 3 for anode.');
+    end
 end
 
 % I의 평균을 필드에 저장하기 
@@ -122,70 +141,30 @@ for i = 1:length(step_chg)-1
    data(step_chg(i)).R900s = data(step_chg(i)).R(end);
 end
 
+
 % 충전
-% 0.1sec
 for i = 1:length(step_chg)-1
     SOC001sc = [SOC001sc, data(step_chg(i)).SOC(1)];
     R001sc = [R001sc, data(step_chg(i)).R(1)];
-end
-
-
-% 1s
-for i = 1:length(step_chg)-1
     SOC1sc = [SOC1sc, data(step_chg(i)).SOC(10)];
     R1sc = [R1sc, data(step_chg(i)).R(10)];
-end
-
-% 10s
-for i = 1:length(step_chg)-1
     SOC10sc = [SOC10sc, data(step_chg(i)).SOC(56)];
     R10sc = [R10sc, data(step_chg(i)).R(56)];
-end
-
-
-% 30s
-
-for i = 1:length(step_chg)-1
     SOC30sc = [SOC30sc, data(step_chg(i)).SOC(76)];
     R30sc = [R30sc, data(step_chg(i)).R(76)];
-end
-
-% 900s
-for i = 1:length(step_chg)-1
     SOC900sc = [SOC900sc, data(step_chg(i)).SOC(end)];
     R900sc = [R900sc, data(step_chg(i)).R(end)];
 end
-
 % 방전
-% 0.1sec
 for i = 1:length(step_dis)
     SOC001sd = [SOC001sd, data(step_dis(i)).SOC(1)];
     R001sd = [R001sd, data(step_dis(i)).R(1)];
-end
-
-
-% 1s
-for i = 1:length(step_dis)
     SOC1sd = [SOC1sd, data(step_dis(i)).SOC(10)];
     R1sd = [R1sd, data(step_dis(i)).R(10)];
-end
-
-% 10s
-for i = 1:length(step_dis)
     SOC10sd = [SOC10sd, data(step_dis(i)).SOC(56)];
     R10sd = [R10sd, data(step_dis(i)).R(56)];
-end
-
-
-% 30s
-
-for i = 1:length(step_dis)
     SOC30sd = [SOC30sd, data(step_dis(i)).SOC(76)];
     R30sd = [R30sd, data(step_dis(i)).R(76)];
-end
-
-% 900s
-for i = 1:length(step_dis)
     SOC900sd = [SOC900sd, data(step_dis(i)).SOC(end)];
     R900sd = [R900sd, data(step_dis(i)).R(end)];
 end
@@ -193,11 +172,11 @@ end
 
 % spline을 사용하여 점들을 부드럽게 이어주기
 
-smoothed_SOC_001sc = linspace(min(SOC001sc), max(SOC001sc), 100);
-smoothed_R_001sc = spline(SOC001sc, R001sc, smoothed_SOC_001sc);
+smoothed_SOC_001sc = linspace(min(SOC001sc), max(SOC001sc), 100); % 보다 부드러운 곡선을 위해 임의의 구간을 생성합니다.
+smoothed_R_001sc = spline(SOC001sc, R001sc, smoothed_SOC_001sc); % spline 함수를 사용하여 점들을 부드럽게 이어줍니다.
 
-smoothed_SOC_1sc = linspace(min(SOC1sc), max(SOC1sc), 100); % 보다 부드러운 곡선을 위해 임의의 구간을 생성합니다.
-smoothed_R_1sc = spline(SOC1sc, R1sc, smoothed_SOC_1sc); % spline 함수를 사용하여 점들을 부드럽게 이어줍니다.
+smoothed_SOC_1sc = linspace(min(SOC1sc), max(SOC1sc), 100); 
+smoothed_R_1sc = spline(SOC1sc, R1sc, smoothed_SOC_1sc); 
 
 smoothed_SOC_10sc = linspace(min(SOC10sc), max(SOC10sc), 100);
 smoothed_R_10sc = spline(SOC10sc, R10sc, smoothed_SOC_10sc);
