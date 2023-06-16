@@ -4,13 +4,26 @@ clc; clear; close all;
 
 %% Interface
 
-% data_folder = 'C:\Users\deu04\OneDrive\문서\MATLAB\Formation';
-data_folder = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\RAW\GITT\FCC_(6)_GITT2';
-% data_folder = 'C:\Users\jsong\Documents\MATLAB\Data\Formation\CHC_10';
+data_folder = 'G:\공유 드라이브\Battery Software Lab\Data\Hyundai_dataset\GITT\AHC_(5)_GITT';
 
+% Split the path using the delimiter
+splitPath = split(data_folder, '\');
 
-save_path = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\Processed_Data\GITT\FCC_(6)_GITT2'
-I_1C = 0.00477; %[A]
+% Find the index of "Battery Software Lab"
+index = find(contains(splitPath, 'Battery Software Lab'));
+
+% Replace "Data" with "Processed_Data"
+splitPath{index+1} = 'Processed_Data';
+
+% Create the new save_path
+save_path = strjoin(splitPath, '\');
+
+% Create the directory if it doesn't exist
+if ~exist(save_path, 'dir')
+   mkdir(save_path)
+end
+
+I_1C = 0.000477; %[A]
 n_hd = 14; % headline number used in 'readtable' option. WonA: 14, Maccor: 3.
 sample_plot = 1;
 
@@ -54,8 +67,6 @@ for i = 1:length(files)
             data1.step(j) = m;
         end
 
-
-
      %  check for error, if any step has more than one types
      vec_step = unique(data1.step);
      num_step = length(vec_step);
@@ -72,7 +83,7 @@ for i = 1:length(files)
     % plot for selected samples
     if ismember(sample_plot,i)
         figure
-        title(files(i).name(1:end-4))
+        title(strrep(files(i).name(1:end-4), '_', '\_')) % Replace '_' with '\_' in the title
         hold on
         plot(data1.t/3600,data1.V,'-')
         xlabel('time (hours)')
@@ -82,7 +93,10 @@ for i = 1:length(files)
         plot(data1.t/3600,data1.I/I_1C,'-')
         yyaxis right
         ylabel('current (C)')
-        xlim([17.758 17.76])
+        
+        % time_lo_bound = 7228.72 / 3600;
+        % time_up_bound = 8128.72 / 3600;
+        % xlim([time_lo_bound, time_up_bound])
     end
 
     % make struct (output format)
@@ -112,9 +126,6 @@ for i = 1:length(files)
     end
 
     % save output data
-    if ~isfolder(save_path)
-        mkdir(save_path)
-    end
     save_fullpath = [save_path slash files(i).name(1:end-4) '.mat'];
     save(save_fullpath,'data')
 
