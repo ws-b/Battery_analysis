@@ -216,14 +216,14 @@ plot(SOC10sc, R10sc, 'o');
 plot(smoothed_SOC_10sc, smoothed_R_10sc);
 plot(SOC30sc, R30sc, 'o');
 plot(smoothed_SOC_30sc, smoothed_R_30sc);
-% plot(SOC900sc, R900sc, 'o');
-% plot(smoothed_SOC_900sc, smoothed_R_900sc);
+plot(SOC900sc, R900sc, 'o');
+plot(smoothed_SOC_900sc, smoothed_R_900sc);
 hold off;
 
 xlabel('SOC');
 ylabel('Resistance (\Omega )', 'fontsize', 12);
 title('SOC vs Resistance (charge)');
-% legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)', '900s', '900s (line)'); 
+legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)', '900s', '900s (line)'); 
 legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)'); 
 xlim([0 1])
 
@@ -240,15 +240,15 @@ plot(SOC10sd, R10sd, 'o');
 plot(smoothed_SOC_10sd, smoothed_R_10sd);
 plot(SOC30sd, R30sd, 'o');
 plot(smoothed_SOC_30sd, smoothed_R_30sd);
-% plot(SOC900sd, R900sd, 'o');
-% plot(smoothed_SOC_900sd, smoothed_R_900sd);
+plot(SOC900sd, R900sd, 'o');
+plot(smoothed_SOC_900sd, smoothed_R_900sd);
 hold off;
 
 xlabel('SOC');
 ylabel('Resistance (\Omega)', 'fontsize', 12);
 title('SOC vs Resistance (Discharge)');
-% legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)', '900s', '900s (line)');
-legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)');
+legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)', '900s', '900s (line)');
+% legend('100ms', '100ms (line)', '1s', '1s (line)', '10s', '10s (line)', '30s', '30s (line)');
 xlim([0 1]);
 
 
