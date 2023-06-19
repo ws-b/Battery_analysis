@@ -1,7 +1,7 @@
 % 파일 경로 가져오기
 clc; clear; close all;
 
-data_folder = 'D:\Data\대학교 자료\켄텍 자료\현대차과제\Processed_Data\DCIR\HNE_(5)_FC_DCIR';
+data_folder = 'G:\공유 드라이브\Battery Software Lab\Processed_data\Hyundai_dataset\DCIR(1,2)\HNE_(5)_FC_DCIR';
 save_path = data_folder;
 I_1C = 0.00382; %[A]
 id_cfa = 2; % 1 for cathode, 2 for fullcell , 3 for anode 
@@ -288,34 +288,34 @@ for i = 1 : length(BigIC)
 end
  
  
-figure(3);
-hold on;
-
-% for i = 1: length(BigIC)
-    i = 6
-    plot(data(BigIC(i)).t, data(BigIC(i)).V);
-
-    % 최소값과 최대값 계산
-    minVoltage = min(data(BigIC(i)).V);
-    maxVoltage = max(data(BigIC(i)).V);
-
-    % 63.2% 값 계산
-    targetVoltage = minVoltage + 0.632 * (maxVoltage - minVoltage);
-
-    % 63.2%에 가장 가까운 값의 인덱스 찾기
-    [~, idx] = min(abs(data(BigIC(i)).V - targetVoltage));
-
-    % 해당 시간 찾기
-    timeAt632 = data(BigIC(i)).t(idx);
-
-    % 해당 시간에 선 그리기
-    line([timeAt632, timeAt632], [minVoltage, maxVoltage], 'Color', 'red', 'LineStyle', '--');
-
-    xlabel('Time');
-    ylabel('Voltage (V)', 'fontsize', 12);
-    title('Voltage - Time Graph');
-%end
-hold off;
+% figure(3);
+% hold on;
+% 
+% % for i = 1: length(BigIC)
+%     i = 6
+%     plot(data(BigIC(i)).t, data(BigIC(i)).V);
+% 
+%     % 최소값과 최대값 계산
+%     minVoltage = min(data(BigIC(i)).V);
+%     maxVoltage = max(data(BigIC(i)).V);
+% 
+%     % 63.2% 값 계산
+%     targetVoltage = minVoltage + 0.632 * (maxVoltage - minVoltage);
+% 
+%     % 63.2%에 가장 가까운 값의 인덱스 찾기
+%     [~, idx] = min(abs(data(BigIC(i)).V - targetVoltage));
+% 
+%     % 해당 시간 찾기
+%     timeAt632 = data(BigIC(i)).t(idx);
+% 
+%     % 해당 시간에 선 그리기
+%     line([timeAt632, timeAt632], [minVoltage, maxVoltage], 'Color', 'red', 'LineStyle', '--');
+% 
+%     xlabel('Time');
+%     ylabel('Voltage (V)', 'fontsize', 12);
+%     title('Voltage - Time Graph');
+% %end
+% hold off;
 
 
 save('dcir_fit.mat','data')
