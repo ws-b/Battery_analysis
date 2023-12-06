@@ -6,7 +6,7 @@ data_folder = '/Users/wsong/Library/CloudStorage/GoogleDrive-wsong@kentech.ac.kr
 load_path = '/Users/wsong/Library/CloudStorage/GoogleDrive-wsong@kentech.ac.kr/공유 드라이브/Battery Software Lab/Processed_data/Hyundai_dataset/RPT3/HNE_FCC(6)_RPT3_10,-10degC';
 save_path = '/Users/wsong/Downloads/figure';
 I_1C = 0.00477; % Current in Amperes (A)
-slash = filesep; % File separator for the current platform
+slash = filesep;
 
 %% Engine
 % Read .mat files from specified directories
@@ -14,17 +14,17 @@ files = dir([data_folder filesep '*.mat']);
 load_files = dir([load_path filesep '*_OCV.mat']);
 for i = 1:length(files)
     fullpath_now = [data_folder filesep files(i).name];
-    load(fullpath_now); % Load current file
+    load(fullpath_now);
     loadpath_now = [load_path filesep load_files(i).name];
-    load(loadpath_now); % Load corresponding OCV file
+    load(loadpath_now);
     
     % Calculate capacities
-    OCV(4).Q = abs(trapz(OCV(4).t,OCV(4).I))/3600; % Total capacity in Ampere-hours (Ah)
-    OCV(4).cumQ = abs(cumtrapz(OCV(4).t,OCV(4).I))/3600; % Cumulative capacity in Ah
+    OCV(4).Q = abs(trapz(OCV(4).t,OCV(4).I))/3600;
+    OCV(4).cumQ = abs(cumtrapz(OCV(4).t,OCV(4).I))/3600;
 
-    OCV(4).soc = OCV(4).cumQ/OCV(4 ).Q; % State of Charge (SOC)
+    OCV(4).soc = OCV(4).cumQ/OCV(4 ).Q;
     
-    V_rest = data(5).V(end); % Resting voltage at the end of the test
+    V_rest = data(5).V(end);
         
     % Remove duplicates from OCV(4).V
     [V_unique, ia, ~] = unique(OCV(4).V);
