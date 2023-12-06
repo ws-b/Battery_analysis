@@ -33,37 +33,37 @@ for i = 1:length(files)
     % Interpolate SOC value corresponding to V_rest
     soc_at_V_rest = interp1(V_unique, soc_unique, V_rest, 'linear');
     disp(['V_rest = ', num2str(V_rest)]);
-    disp(['SOC = ', num2str(soc_at_V_rest)]); % Display the interpolated SOC value
+    disp(['SOC = ', num2str(soc_at_V_rest)]);
 
 
     % Concatenate data from all files
-    all_t = []; % Time
-    all_V = []; % Voltage
-    all_I = []; % Current
+    all_t = [];
+    all_V = [];
+    all_I = [];
 
     for j = 1:9
-        all_t = [all_t; data(j).t / 3600]; % Convert time to hours
-        all_V = [all_V; data(j).V]; % Voltage data
-        all_I = [all_I; data(j).I / I_1C]; % Normalize current by 1C rate
+        all_t = [all_t; data(j).t / 3600];
+        all_V = [all_V; data(j).V];
+        all_I = [all_I; data(j).I / I_1C];
     end
 
     % Figure 1: Voltage & Current vs Time
     figure;
     yyaxis left;
-    plot(all_t, all_V, 'b', 'LineWidth', 2); % 파란색, 굵은 선
+    plot(all_t, all_V, 'b', 'LineWidth', 2);
     ylabel('Voltage (V)', 'FontSize', 12, 'FontWeight', 'bold');
-    ylim([2.3, 4.5]); % y축 범위 설정
+    ylim([2.3, 4.5]);
     yyaxis right;
-    plot(all_t, all_I, 'r', 'LineWidth', 2); % 빨간색, 굵은 선
+    plot(all_t, all_I, 'r', 'LineWidth', 2);
     ylabel('Current (C-rate)', 'FontSize', 12, 'FontWeight', 'bold');
     xlabel('Time (Hours)', 'FontSize', 12, 'FontWeight', 'bold');
     title(['Voltage & Current vs Time for ' strjoin(strsplit(files(i).name,'_'),' ')], 'FontSize', 14, 'FontWeight', 'bold');
-    legend('Voltage', 'Current'); % 범례 추가
+    legend('Voltage', 'Current');
     saveas(gcf, fullfile(save_path, ['file_' num2str(i) '_1.jpg'])); 
         
     % Figure 2: Voltage vs Elapsed Time
     figure;
-    plot(data(5).steptime - data(5).steptime(1), data(5).V, 'b', 'LineWidth', 2); % 파란색, 굵은 선
+    plot(data(5).steptime - data(5).steptime(1), data(5).V, 'b', 'LineWidth', 2);
     durationFormat = 's';
     data(5).steptime.Format = durationFormat;
     xlabel('Elapsed Time (Sec)', 'FontSize', 12, 'FontWeight', 'bold');
@@ -73,17 +73,17 @@ for i = 1:length(files)
     
     % Figure 3: dV/dt vs Elapsed Time
     figure;
-    window_size = 20; % 이동 평균 창 크기
-    dvdt = diff(data(5).V) ./ diff(data(5).t); % dV/dt 계산
-    dvdt_mov = movmean(dvdt, window_size); % dV/dt의 이동 평균
-    dvdt_mov_mVmin = dvdt_mov * 1000; % dV/dt를 mV/sec로 변환
+    window_size = 20; 
+    dvdt = diff(data(5).V) ./ diff(data(5).t);
+    dvdt_mov = movmean(dvdt, window_size);
+    dvdt_mov_mVmin = dvdt_mov * 1000;
     
-    plot(data(5).steptime(2:end) - data(5).steptime(1), dvdt_mov_mVmin, 'r', 'LineWidth', 2); % 빨간색, 굵은 선
+    plot(data(5).steptime(2:end) - data(5).steptime(1), dvdt_mov_mVmin, 'r', 'LineWidth', 2);
     data(5).steptime.Format = durationFormat;
     xlabel('Elapsed Time (Sec)', 'FontSize', 12, 'FontWeight', 'bold');
     ylabel('dV/dt (mV\cdotsec^{-1})', 'FontSize', 12, 'FontWeight', 'bold');
     title(['dV/dt vs Elapsed Time for ' strjoin(strsplit(files(i).name,'_'),' ')], 'FontSize', 14, 'FontWeight', 'bold');
-    ylim([-6 1]); % y축 범위 설정
-    xlim([seconds(0), seconds(1800)]); % x축 범위 설정
+    ylim([-6 1]);
+    xlim([seconds(0), seconds(1800)]);
     saveas(gcf, fullfile(save_path, ['file_' num2str(i) '_3.jpg']));
 end
