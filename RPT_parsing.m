@@ -3,7 +3,7 @@ clc; clear; close all;
 
 %% Interface
 
-data_folder = '/Users/wsong/Documents/현대/Data/Hyundai_dataset/RPT2_GITT제외_25degC/HNE_FCC_(6)_RPT2';
+data_folder = '/Users/wsong/Library/CloudStorage/GoogleDrive-wsong@kentech.ac.kr/공유 드라이브/Battery Software Lab/Data/Hyundai_dataset/RPT3/HNE_FCC(6)_RPT3_10,-10degC';
 
 % Replace 'RAW' with 'Processed_Data' in the path
 save_path = strrep(data_folder, 'Data', 'Processed_data');
@@ -21,8 +21,8 @@ sample_plot = 1;
 slash = filesep;
 files = dir([data_folder slash '*.txt']); % select only txt files (raw data)
 
-for i = 1:length(files)
-    fullpath_now = [data_folder slash files(i).name]; % path for i-th file in the folder
+for file_num = 1:length(files)
+    fullpath_now = [data_folder slash files(file_num).name]; % path for i-th file in the folder
     data_now = readtable(fullpath_now,'FileType','text',...
                     'NumHeaderLines',n_hd,'readVariableNames',0); % load the data
 
@@ -93,7 +93,7 @@ for i = 1:length(files)
     data = repmat(data_line,num_step,1);
 
     % fill in the struc
-    n =1; 
+    n = 1; 
     for i_step = 1:num_step
 
         range = find(data1.step == vec_step(i_step));
@@ -114,190 +114,212 @@ for i = 1:length(files)
     end
 
     % save output data
-    save_fullpath = [save_path slash files(i).name(1:end-4) '.mat'];
+    save_fullpath = [save_path slash files(file_num).name(1:end-4) '.mat'];
     save(save_fullpath,'data')
-end
-
-
-%RPT- formation
-
-Cycle = 4; 
-indices = [];
-for j = 1:length(data)
-    if data(j).cycle == 4
-        indices = [indices, j];
-        index1 = indices(end);
-        disp(['Value found at index ', num2str(j)]);
+    
+    
+    %RPT- formation
+    
+    Cycle = 4; 
+    indices = [];
+    for j = 1:length(data)
+        if data(j).cycle == 4
+            indices = [indices, j];
+            index1 = indices(end);
+            disp(['Value found at index ', num2str(j)]);
+        end
     end
-end
-
-if isempty(indices)
-    error('No cycles with the specified value found.');
-end
-
-fields = fieldnames(data);
-FORMATION = repmat(struct(), index1, 1);
-for i = 1:index1
-    for j = 1:length(fields)
-        fieldName = fields{j};
-        FORMATION(i).(fieldName) = data(i).(fieldName);
+    
+    if isempty(indices)
+        error('No cycles with the specified value found.');
     end
-end
-
-% RPT-OCV
-Vmax = 4.2 ; %Vmin = 2.5;
-cutoff1 = 0.05; %-0.05;
-indices = [];
-for j = 1:length(data)
-    data(j).Iavg = mean(data(j).I);
-    if abs(Vmax - data(j).V(end)) < 0.001 && abs(cutoff1 - data(j).Iavg/I_1C) < 0.001 && j > index1   
-        indices = [indices, j];
-        index2 = indices(1);
-        disp(['Value found at index ', num2str(j)]);
+    
+    fields = fieldnames(data);
+    FORMATION = repmat(struct(), index1, 1);
+    for i = 1:index1
+        for j = 1:length(fields)
+            fieldName = fields{j};
+            FORMATION(i).(fieldName) = data(i).(fieldName);
+        end
     end
-end
-
-if isempty(indices)
-    error('No cycles with the specified value found.');
-end
-
-fields = fieldnames(data);
-OCV = repmat(struct(), index2, 1);
-for i = index1:index2+1
-    for j = 1:length(fields)
-        fieldName = fields{j};
-        OCV(i).(fieldName) = data(i).(fieldName);
+    
+    % RPT-OCV
+    Vmax = 4.2 ; %Vmin = 2.5;
+    cutoff1 = 0.05; %-0.05;
+    indices = [];
+    for j = 1:length(data)
+        data(j).Iavg = mean(data(j).I);
+        if abs(Vmax - data(j).V(end)) < 0.001 && abs(cutoff1 - data(j).Iavg/I_1C) < 0.001 && j > index1   
+            indices = [indices, j];
+            index2 = indices(1);
+            disp(['Value found at index ', num2str(j)]);
+        end
     end
-end
-
-%RPT-CRATE
-Crate = -6; %Crate = -6; %AHC = 6
-indices = [];
-for j = 1:length(data)
-    data(j).Iavg = mean(data(j).I);
-    if abs(Crate - data(j).Iavg/I_1C) < 0.01
-        disp(['Value found at index ', num2str(j)]);
-        indices = [indices, j];
-        index3 = indices(1);
+    
+    if isempty(indices)
+        error('No cycles with the specified value found.');
     end
-end
-
-if isempty(indices)
-    error('No cycles with the specified value found.');
-end
-
-fields = fieldnames(data);
-CRATE = repmat(struct(), index3, 1);
-for i = index2+1:index3+1
-    for j = 1:length(fields)
-        fieldName = fields{j};
-        CRATE(i).(fieldName) = data(i).(fieldName);
+    
+    fields = fieldnames(data);
+    OCV = repmat(struct(), index2, 1);
+    for i = index1:index2+1
+        for j = 1:length(fields)
+            fieldName = fields{j};
+            OCV(i).(fieldName) = data(i).(fieldName);
+        end
     end
-end
-
-%RPT-DCIR
-Vmax = 4.2; %Vmin = 2.5; %AHC =0.01;
-cutoff2 = 0.2;
-indices = [];
-for j = 1:length(data)
-    if abs(Vmax - data(j).V(end)) < 0.001 && abs(cutoff2 - data(j).Iavg/I_1C) < 0.001 && j > index2 && j < index3
-        disp(['Value found at index ', num2str(j)]);
-        indices = [indices, j];
-        index4 = indices(1);
+    
+    %RPT-CRATE
+    Crate = -6; %Crate = -6; %AHC = 6
+    indices = [];
+    for j = 1:length(data)
+        data(j).Iavg = mean(data(j).I);
+        if abs(Crate - data(j).Iavg/I_1C) < 0.01
+            disp(['Value found at index ', num2str(j)]);
+            indices = [indices, j];
+            index3 = indices(1);
+        end
     end
-end
-
-if isempty(indices)
-    error('No cycles with the specified value found.');
-end
-
-fields = fieldnames(data);
-DCIR = repmat(struct(), index4, 1);
-for i = index2+1:index4+1
-    for j = 1:length(fields)
-        fieldName = fields{j};
-        DCIR(i).(fieldName) = data(i).(fieldName);
+    
+    if isempty(indices)
+        error('No cycles with the specified value found.');
     end
+    
+    fields = fieldnames(data);
+    CRATE = repmat(struct(), index3, 1);
+    for i = index2+1:index3+1
+        for j = 1:length(fields)
+            fieldName = fields{j};
+            CRATE(i).(fieldName) = data(i).(fieldName);
+        end
+    end
+    
+    %RPT-DCIR
+    Vmax = 4.2; %Vmin = 2.5; %AHC =0.01;
+    cutoff2 = 0.2;
+    indices = [];
+    for j = 1:length(data)
+        if abs(Vmax - data(j).V(end)) < 0.001 && abs(cutoff2 - data(j).Iavg/I_1C) < 0.001 && j > index2 && j < index3
+            disp(['Value found at index ', num2str(j)]);
+            indices = [indices, j];
+            index4 = indices(1);
+        end
+    end
+    
+    if isempty(indices)
+        error('No cycles with the specified value found.');
+    end
+    
+    fields = fieldnames(data);
+    DCIR = repmat(struct(), index4, 1);
+    for i = index2+1:index4+1
+        for j = 1:length(fields)
+            fieldName = fields{j};
+            DCIR(i).(fieldName) = data(i).(fieldName);
+        end
+    end
+    
+    %RPT 범위
+    FORMATION = FORMATION(1:index1);
+    OCV = OCV(index1:index2+1);
+    CRATE = CRATE(index4+1:index3+1);
+    DCIR = DCIR(index2+1:index4+1);    
+
+
+    % Save FORMATION data set
+    save_fullpath = [save_path slash files(file_num).name(1:end-4) '_FORMATION.mat'];
+    save(save_fullpath, 'FORMATION');
+
+    % Save OCV data set
+    save_fullpath = [save_path slash files(file_num).name(1:end-4) '_OCV.mat'];
+    save(save_fullpath, 'OCV');
+
+    % Save CRATE data set
+    save_fullpath = [save_path slash files(file_num).name(1:end-4) '_CRATE.mat'];
+    save(save_fullpath, 'CRATE');
+
+    % Save DCIR data set
+    save_fullpath = [save_path slash files(file_num).name(1:end-4) '_DCIR.mat'];
+    save(save_fullpath, 'DCIR');
+
+
+    % FORMATION 데이터 세트에 대한 그래프 그리기
+    all_times = vertcat(FORMATION.t);
+    all_voltages = vertcat(FORMATION.V);
+    all_currents = vertcat(FORMATION.I);
+    
+    
+    
+    figure;
+    hold on;
+    title('FORMATION');
+    xlabel('Time (hours)');
+    yyaxis left;
+    ylabel('Voltage (V)');
+    plot(all_times/3600, all_voltages, '-');
+    
+    yyaxis right;
+    ylabel('C rate'); 
+    plot(all_times/3600, all_currents/I_1C, '-');
+    hold off;
+    
+    % OCV 데이터 세트에 대한 그래프 그리기
+    all_times = vertcat(OCV.t);
+    all_voltages = vertcat(OCV.V);
+    all_currents = vertcat(OCV.I);
+    
+    figure;
+    hold on;
+    title('OCV');
+    xlabel('Time (hours)');
+    yyaxis left;
+    ylabel('Voltage (V)');
+    plot(all_times/3600, all_voltages, '-');
+    
+    yyaxis right;
+    ylabel('C rate'); 
+    plot(all_times/3600, all_currents/I_1C, '-');
+    hold off;
+    
+    % CRATE 데이터 세트에 대한 그래프 그리기
+    all_times = vertcat(CRATE.t);
+    all_voltages = vertcat(CRATE.V);
+    all_currents = vertcat(CRATE.I);
+    
+    figure;
+    hold on;
+    title('CRATE');
+    xlabel('Time (hours)');
+    yyaxis left;
+    ylabel('Voltage (V)');
+    plot(all_times/3600, all_voltages, '-');
+    
+    yyaxis right;
+    ylabel('C rate'); 
+    plot(all_times/3600, all_currents/I_1C, '-');
+    hold off;
+    
+    % DCIR 데이터 세트에 대한 그래프 그리기
+    all_times = vertcat(DCIR.t);
+    all_voltages = vertcat(DCIR.V);
+    all_currents = vertcat(DCIR.I);
+    
+    figure;
+    hold on;
+    title('DCIR');
+    xlabel('Time (hours)');
+    yyaxis left;
+    ylabel('Voltage (V)');
+    plot(all_times/3600, all_voltages, '-');
+    
+    yyaxis right;
+    ylabel('C rate'); 
+    plot(all_times/3600, all_currents/I_1C, '-');
+    hold off;
+
 end
 
 
 
 
-%RPT 범위
-FORMATION = FORMATION(1:index1);
-OCV = OCV(index1:index2+1);
-CRATE = CRATE(index4+1:index3+1);
-DCIR = DCIR(index2+1:index4+1);
 
-
-% FORMATION 데이터 세트에 대한 그래프 그리기
-all_times = vertcat(FORMATION.t);
-all_voltages = vertcat(FORMATION.V);
-all_currents = vertcat(FORMATION.I);
-
-figure;
-hold on;
-title('FORMATION');
-xlabel('Time (hours)');
-yyaxis left;
-ylabel('Voltage (V)');
-plot(all_times/3600, all_voltages, '-');
-
-yyaxis right;
-ylabel('C rate'); 
-plot(all_times/3600, all_currents/I_1C, '-');
-hold off;
-
-% OCV 데이터 세트에 대한 그래프 그리기
-all_times = vertcat(OCV.t);
-all_voltages = vertcat(OCV.V);
-all_currents = vertcat(OCV.I);
-
-figure;
-hold on;
-title('OCV');
-xlabel('Time (hours)');
-yyaxis left;
-ylabel('Voltage (V)');
-plot(all_times/3600, all_voltages, '-');
-
-yyaxis right;
-ylabel('C rate'); 
-plot(all_times/3600, all_currents/I_1C, '-');
-hold off;
-
-% CRATE 데이터 세트에 대한 그래프 그리기
-all_times = vertcat(CRATE.t);
-all_voltages = vertcat(CRATE.V);
-all_currents = vertcat(CRATE.I);
-
-figure;
-hold on;
-title('CRATE');
-xlabel('Time (hours)');
-yyaxis left;
-ylabel('Voltage (V)');
-plot(all_times/3600, all_voltages, '-');
-
-yyaxis right;
-ylabel('C rate'); 
-plot(all_times/3600, all_currents/I_1C, '-');
-hold off;
-
-% DCIR 데이터 세트에 대한 그래프 그리기
-all_times = vertcat(DCIR.t);
-all_voltages = vertcat(DCIR.V);
-all_currents = vertcat(DCIR.I);
-
-figure;
-hold on;
-title('DCIR');
-xlabel('Time (hours)');
-yyaxis left;
-ylabel('Voltage (V)');
-plot(all_times/3600, all_voltages, '-');
-
-yyaxis right;
-ylabel('C rate'); 
-plot(all_times/3600, all_currents/I_1C, '-');
-hold off;
